@@ -1,0 +1,561 @@
+[include mainsail.cfg]
+[include sovol-macros.cfg]
+[include timelapse.cfg] # DONT FORGET TO INSTALL THE TIMELAPSE PLUGIN
+
+# PLEASE UNCOMMENT THE FILE THAT BEST FITS YOUR CONFIGURATION
+# DON'T NEED OR WANT TO USE SOMETHING, DON'T USE (UNCOMMENT) IT
+
+# Configs and menu for the stock lcd screen.
+[include options/lcd/*.cfg]
+
+# If you are using the stock probe, keep the following lines as-is.
+# If you have an Eddy probe, comment the stock probe and uncomment the eddy, then go read options/probe/eddy.cfg. 
+# Also, when using eddy, comment out/remove the [probe] section here in the printer.cfg (don't forget the bottom 'SAVE_CONFIG' block)
+#[include options/probe/stock.cfg] # Stock probe, default
+[include options/probe/eddy.cfg] # BTT Eddy probe
+
+# Want to use a thermistor in your enclosure? You can use a RPi Pico with a BME280.
+# Read the guide at /pico-thermistor/ on how to do this. Once ready you can uncomment the cfg below.
+#[include options/thermistor/pico.cfg
+
+[mcu]
+serial: /dev/serial/by-id/usb-Klipper_stm32f103xe_36FFDC05334D413204660651-if00
+restart_method: command     
+
+[mcu extra_mcu]
+serial: /dev/serial/by-id/usb-Klipper_stm32f103xe_57FF67067165575420192087-if00
+restart_method: command      
+
+[virtual_sdcard]
+path: ~/printer_data/gcodes
+on_error_gcode: CANCEL_PRINT
+
+[printer]
+kinematics: corexy           
+max_velocity: 700            
+max_accel: 4500  # 10000            
+#max_accel_to_decel: 10000 # deprecated
+minimum_cruise_ratio: 0.5
+max_z_velocity: 20           
+max_z_accel: 500             
+square_corner_velocity: 5.0 
+
+[stepper_x]
+step_pin: PE2
+dir_pin: !PE0
+enable_pin: !PE3
+rotation_distance: 40         
+microsteps: 16                
+full_steps_per_rotation:200   
+endstop_pin: tmc2209_stepper_x: virtual_endstop              
+position_min: 0               
+position_endstop: 355         
+position_max: 355             
+homing_speed: 30              
+homing_retract_dist: 0        
+homing_positive_dir: True     
+#--------------------------------------------------------------------
+[tmc2209 stepper_x]
+uart_pin: PE1
+interpolate: True             
+run_current: 1.1              
+#hold_current: 1.2             
+sense_resistor: 0.150         
+stealthchop_threshold: 0      
+uart_address:3
+driver_sgthrs: 70
+diag_pin: PE15
+
+[stepper_y]
+step_pin: PB8
+dir_pin: !PB6
+enable_pin: !PB9
+rotation_distance: 40         
+microsteps: 16                
+full_steps_per_rotation:200   
+endstop_pin: tmc2209_stepper_y: virtual_endstop              
+position_min: 0               
+position_endstop: 364         
+position_max: 364            
+homing_speed: 30              
+homing_retract_dist: 0        
+homing_positive_dir: true     
+#--------------------------------------------------------------------
+[tmc2209 stepper_y]
+uart_pin: PB7
+interpolate: True             
+run_current: 1.1              
+#hold_current: 1.2             
+sense_resistor: 0.150         
+stealthchop_threshold: 0      
+uart_address:3
+driver_sgthrs: 70
+diag_pin: PE13 
+
+[stepper_z] #motherboard：Z3 
+step_pin:PC0    
+dir_pin:PE5    
+enable_pin:!PC1    
+rotation_distance: 40         
+gear_ratio: 80:12             
+microsteps: 16                
+endstop_pin: probe:z_virtual_endstop           
+position_max: 347             
+position_min: -5              
+#position_endstop: 0
+homing_speed: 15.0
+homing_retract_dist: 5.0
+homing_retract_speed: 15.0
+second_homing_speed: 10.0
+
+[tmc2209 stepper_z]
+uart_pin: PE6 
+interpolate: true             
+run_current: 0.55           
+#hold_current: 0.58         
+sense_resistor: 0.150         
+stealthchop_threshold: 999999 
+uart_address:3
+
+[stepper_z1] ##motherboard：Z1
+step_pin:PD3  
+dir_pin:!PD1 
+enable_pin:!PD4 
+rotation_distance: 40         
+gear_ratio: 80:12            
+microsteps: 16               
+
+[tmc2209 stepper_z1]
+uart_pin:PD2  
+interpolate: true             
+run_current:  0.55          
+#hold_current: 0.58           
+sense_resistor: 0.150         
+stealthchop_threshold: 999999 
+uart_address:3
+
+[stepper_z2] ##motherboard：Z2
+step_pin:PD7
+dir_pin:PD5   
+enable_pin:!PB5
+rotation_distance: 40         
+gear_ratio: 80:12             
+microsteps: 16                
+
+[tmc2209 stepper_z2]
+uart_pin:PD6  
+interpolate: true             
+run_current: 0.55            
+#hold_current: 0.58           
+sense_resistor: 0.150         
+stealthchop_threshold: 999999 
+uart_address:3
+
+[stepper_z3] ##motherboard：Z4
+step_pin:PD11 
+dir_pin:!PD9 
+enable_pin:!PD12   
+rotation_distance: 40         
+gear_ratio: 80:12             
+microsteps: 16                
+
+[tmc2209 stepper_z3]
+uart_pin:PD10    
+interpolate: true            
+run_current: 0.55         
+#hold_current: 0.58           
+sense_resistor: 0.150         
+uart_address:3
+stealthchop_threshold: 999999 
+
+[thermistor my_thermistor_e]
+temperature1:25
+resistance1:110000
+temperature2:100
+resistance2:7008
+temperature3:220
+resistance3:435
+
+[extruder]
+step_pin: extra_mcu:PA8   
+dir_pin: extra_mcu:PB8    
+enable_pin:!extra_mcu: PB11   
+rotation_distance: 6.5 
+microsteps: 16                
+full_steps_per_rotation: 200 
+nozzle_diameter: 0.400        
+filament_diameter: 1.75  
+max_extrude_only_distance: 150     
+heater_pin:extra_mcu:PB9  
+sensor_type:my_thermistor_e  
+pullup_resistor: 11500
+sensor_pin: extra_mcu:PA5  
+min_temp: 5                  
+max_temp: 305                 
+max_power: 1.0                
+min_extrude_temp: 5
+#control : pid
+#pid_kp : 33.838
+#pid_ki : 5.223
+#pid_kd : 47.752
+pressure_advance: 0.023
+pressure_advance_smooth_time: 0.035    
+
+[tmc2209 extruder]
+uart_pin: extra_mcu:PB10  
+interpolate: True             
+run_current: 0.8           
+#hold_current: 0.75             
+uart_address:3
+sense_resistor: 0.150          
+
+[verify_heater extruder]      
+max_error: 120                
+check_gain_time:30           
+hysteresis: 5                
+heating_gain: 2               
+
+# [filament_switch_sensor filament_sensor]
+# pause_on_runout: True
+# event_delay: 3.0
+# pause_delay: 0.5
+# switch_pin: PE9
+
+[filament_motion_sensor encoder_sensor]
+switch_pin: PE9
+detection_length: 6.0
+extruder: extruder
+pause_on_runout: False
+runout_gcode:
+  PAUSE
+  M117 Filament encoder runout
+insert_gcode:
+  M117 Filament encoder inserted
+###macro.cfg file and replace all instances of filament_switch_sensor filament_sensor with filament_motion_sensor encoder_sensor
+
+
+[thermistor my_thermistor]
+temperature1:25
+resistance1:100000
+temperature2:50
+resistance2:18085.4
+temperature3:100
+resistance3:5362.6
+
+[heater_bed]
+heater_pin:PA0
+sensor_type: my_thermistor  
+sensor_pin: PC5
+max_power: 1.0               
+min_temp: 5                  
+max_temp: 105                
+#control : pid
+#pid_kp : 73.571
+#pid_ki : 1.820
+#pid_kd : 783.849
+
+[verify_heater heater_bed]      
+max_error: 120                
+check_gain_time:40           
+hysteresis: 5                
+heating_gain: 2 
+
+# PLEASE REMOVE THIS WHEN USING EDDY
+#[probe]
+#z_offset: 0
+#[probe]
+#pin: extra_mcu:PB6    
+#x_offset: -17                  
+#y_offset: 10             
+#z_offset : 0
+#speed: 10  # 15.0
+#speed: 5.0
+#samples: 3  # 2
+#sample_retract_dist: 5  # 2.0
+#lift_speed: 25  # 50
+#samples_result: average
+#samples_tolerance: 0.016
+#samples_tolerance_retries: 5  # 2
+
+
+[probe_pressure]
+pin: ^!PE12     
+x_offset: 0                  
+y_offset: 0
+z_offset : 0
+speed: 1.0
+
+[quad_gantry_level]          
+gantry_corners:              
+	-60,-10
+	410,420
+points:
+	36,10
+	36,320
+	346,320
+	346,10
+speed: 350  # 400                   
+horizontal_move_z: 5 # 10       
+retry_tolerance: 0.0075 # 0.05      
+retries: 6
+max_adjust: 10  # 30   
+
+[multi_pin print_cooling_fan_pins]
+pins: extra_mcu:PA7, extra_mcu:PB1
+
+# print/part cooling fan
+[fan]
+pin: multi_pin:print_cooling_fan_pins
+max_power: 1.0
+
+[fan_generic exhaust_fan] # exhaust fan
+pin: PA2
+max_power: 1.0
+
+# MCU fan, aka noisy boi, is now only enabled when using steppers, extruder, heatbed; 5min timeout
+#[controller_fan MCU_fan]
+#pin: PA1
+#max_power: 1
+#kick_start_time: 0.5
+#fan_speed: 1
+#idle_timeout: 300
+#heater: extruder, heater_bed
+#stepper: stepper_x, stepper_y
+
+# Want your fan (host) temperature controlled? Uncomment the next section and comment out the above section, derived from: https://www.reddit.com/r/Sovol/comments/1cqntzu/first_mod_on_my_sv08_noctua_fan_for_the/
+# WARNING: Do you have a Noctua 24V 4010 fan (eg. NF-A4x10 24V PWM)? Then this will not work and results in a non-spinning fan.
+# In that case you can either use the above 'controller_fan' section or use 'control: watermark' and leave the pid entries commented out.
+[temperature_fan MCU_fan]
+pin: PA1
+kick_start_time: 0.5
+max_power: 1.0
+min_temp: 0
+max_temp: 90
+hardware_pwm: true
+target_temp: 50
+sensor_type: temperature_host # please comment out or remove the [temperature_sensor Host_temp] section if you don't want the temperature shown twice in the interface.
+max_speed: 1.0
+min_speed: 0.1
+control: pid
+pid_Kp: 2.0     ;40
+pid_Ki: 5.0     ;0.2
+pid_Kd: 0.5     ;0.1
+pid_deriv_time: 2.0
+#control: watermark # use this control if pid control does not work for your fan
+
+[heater_fan hotend_fan]      
+pin: extra_mcu:PA6   
+max_power: 1.0               
+kick_start_time: 0.5         
+heater: extruder             
+heater_temp: 50              
+tachometer_pin:extra_mcu:PA1
+tachometer_ppr: 1
+tachometer_poll_interval: 0.0013
+
+[gcode_arcs]                       
+resolution: 1.0                    
+
+# Defined as an LED for ease of control
+[led main_led]
+white_pin:PA3
+cycle_time: 0.010
+hardware_pwm: False
+initial_WHITE: 1.0
+
+[idle_timeout]
+gcode: _IDLE_TIMEOUT
+timeout: 600
+
+
+[temperature_sensor mcu_temp]         
+sensor_type: temperature_mcu
+min_temp:0
+max_temp:100
+
+[temperature_sensor Host_temp]     
+sensor_type: temperature_host
+min_temp: 0
+max_temp: 110
+
+[temperature_sensor Toolhead_Temp]
+sensor_type: temperature_mcu
+sensor_mcu: extra_mcu
+
+[pause_resume]
+
+[exclude_object]
+
+[adxl345]
+cs_pin:extra_mcu:PB12
+
+[resonance_tester]
+accel_chip: adxl345
+probe_points:
+    175, 175, 30  # an example175 Y175 Z30
+accel_per_hz:50
+min_freq:1
+max_freq:100
+max_smoothing:0.2
+hz_per_sec:0.5
+
+[input_shaper]
+damping_ratio_x: 0.001
+damping_ratio_y: 0.001
+shaper_type_x = mzv
+shaper_freq_x = 56.2
+shaper_type_y = mzv
+shaper_freq_y = 41.0
+
+[save_variables]
+filename = ~/printer_data/config/saved_variables.cfg
+
+
+[homing_override]
+gcode:
+   {% if not 'Z' in params and not 'Y' in params and 'X' in params %}
+     G28 X
+     G0 X348 F1200
+   {% elif not 'Z' in params and not 'X' in params and 'Y' in params %}
+     G28 Y
+     G0 Y360  F1200
+   {% elif not 'Z' in params and 'X' in params and 'Y' in params %}
+     G28 Y
+     G0 Y360  F1200
+     G4 P2000
+     G28 X
+     G0 X348  F1200
+   {% elif 'Z' in params and not 'X' in params and not 'Y' in params %}
+     G90
+     G0  X191 Y165 F3600
+     G28 Z
+     G0  Z10 F600
+   {% else %}
+     G90
+     G0 Z5 F300
+     G28 Y
+     G0 Y360  F1200
+     G4 P2000
+     G28 X
+     G0 X348  F1200
+     G90
+     G0  X191 Y165 F3600
+     G28 Z
+     G0  Z10 F600
+   {% endif %}
+axes: xyz
+set_position_z: 0
+
+#[bed_mesh]
+#speed: 350 # 500                   
+#horizontal_move_z: 5         
+#mesh_min: 10,10              
+#mesh_max: 333,340            
+#probe_count: 9,9             
+#algorithm: bicubic   
+#bicubic_tension: 0.4
+#split_delta_z: 0.0125 # 0.016
+#mesh_pps:3,3
+#adaptive_margin: 5
+#fade_start: 0
+#fade_end: 10
+#fade_target: 0
+
+#*# <---------------------- SAVE_CONFIG ---------------------->
+#*# DO NOT EDIT THIS BLOCK OR BELOW. The contents are auto-generated.
+#*#
+#*# [extruder]
+#*# control = pid
+#*# pid_kp = 32.743
+#*# pid_ki = 6.237
+#*# pid_kd = 42.974
+#*#
+#*# [heater_bed]
+#*# control = pid
+#*# pid_kp = 74.109
+#*# pid_ki = 2.206
+#*# pid_kd = 622.516
+#*#
+#*# [probe]
+#*# z_offset = 1.743
+#*#
+#*# [bed_mesh default]
+#*# version = 1
+#*# points =
+#*# 	0.098900, 0.046623, 0.036356, 0.047579, 0.070801, 0.112752, 0.164930, 0.188809, 0.169707, 0.144417, 0.114485, 0.104807, 0.100463, 0.101608, 0.094914
+#*# 	-0.008852, -0.020249, 0.011169, 0.045944, 0.094420, 0.140461, 0.185353, 0.204787, 0.203051, 0.185825, 0.167836, 0.152760, 0.134994, 0.118572, 0.106306
+#*# 	-0.031859, -0.025531, 0.009675, 0.046616, 0.093822, 0.132474, 0.175890, 0.199665, 0.193361, 0.185117, 0.168410, 0.157657, 0.140895, 0.122515, 0.110246
+#*# 	-0.040972, -0.058453, -0.024978, 0.014635, 0.049670, 0.088988, 0.131741, 0.149856, 0.154984, 0.160759, 0.145403, 0.135082, 0.120646, 0.107203, 0.091411
+#*# 	-0.047472, -0.084828, -0.073420, -0.044954, -0.004640, 0.029885, 0.062209, 0.081213, 0.086625, 0.093751, 0.085934, 0.077191, 0.066768, 0.053554, 0.046578
+#*# 	0.031821, -0.001036, -0.004202, 0.004099, 0.030970, 0.050786, 0.076341, 0.094317, 0.100214, 0.107698, 0.097910, 0.096340, 0.094948, 0.082804, 0.080169
+#*# 	0.062911, 0.046496, 0.031067, 0.028686, 0.038305, 0.047826, 0.061989, 0.069530, 0.076048, 0.080279, 0.075065, 0.079960, 0.076365, 0.072322, 0.080902
+#*# 	0.114942, 0.100042, 0.074768, 0.066327, 0.065404, 0.064853, 0.084155, 0.076517, 0.085165, 0.090160, 0.084654, 0.087795, 0.088818, 0.088526, 0.100641
+#*# 	0.090901, 0.083440, 0.053368, 0.041963, 0.029168, 0.027525, 0.033548, 0.029368, 0.030006, 0.026585, 0.028485, 0.029412, 0.032162, 0.036825, 0.058167
+#*# 	0.056038, 0.040812, 0.015989, 0.007186, 0.000918, -0.009157, 0.006826, 0.003242, 0.007829, 0.005067, 0.000448, -0.001227, -0.007945, -0.010740, 0.021345
+#*# 	0.026934, 0.002859, -0.014885, -0.031912, -0.034317, -0.038418, -0.032659, -0.033733, -0.032711, -0.035764, -0.046214, -0.043298, -0.049169, -0.057165, -0.001873
+#*# 	0.040985, 0.028396, 0.007072, -0.000412, 0.003532, -0.002798, 0.012800, 0.007536, 0.017658, 0.015762, 0.010226, 0.005292, -0.001930, -0.010848, 0.023512
+#*# 	0.064000, 0.059346, 0.037345, 0.021683, 0.019703, 0.011556, 0.016527, 0.013465, 0.019222, 0.016988, 0.018922, 0.023977, 0.026781, 0.021235, 0.062645
+#*# 	0.080656, 0.062319, 0.028735, 0.018848, 0.014468, 0.009682, 0.010498, 0.007477, 0.009143, 0.011649, 0.020165, 0.020643, 0.030002, 0.045657, 0.090872
+#*# 	0.096329, 0.038043, -0.033718, -0.062362, -0.075285, -0.084307, -0.071805, -0.068905, -0.071631, -0.076584, -0.075381, -0.051453, -0.020549, 0.033970, 0.117661
+#*# x_count = 15
+#*# y_count = 15
+#*# mesh_x_pps = 3
+#*# mesh_y_pps = 3
+#*# algo = bicubic
+#*# tension = 0.5
+#*# min_x = 15.0
+#*# max_x = 334.90000000000003
+#*# min_y = 18.0
+#*# max_y = 334.95999999999987
+#*#
+#*# [probe_eddy_current btt_eddy]
+#*# reg_drive_current = 15
+#*# calibrate =
+#*# 	0.050625:3213524.416,0.090000:3212743.595,0.129375:3211996.703,
+#*# 	0.170625:3211223.457,0.210000:3210503.809,0.249375:3209819.060,
+#*# 	0.290625:3209110.528,0.330000:3208397.656,0.369375:3207709.164,
+#*# 	0.410625:3207007.729,0.450000:3206347.001,0.489375:3205725.027,
+#*# 	0.530625:3205031.912,0.570000:3204383.152,0.609375:3203738.455,
+#*# 	0.650625:3203108.568,0.690000:3202497.080,0.729375:3201919.726,
+#*# 	0.770625:3201291.340,0.810000:3200723.680,0.849375:3200144.548,
+#*# 	0.890625:3199538.108,0.930000:3198972.224,0.969375:3198460.217,
+#*# 	1.010625:3197893.952,1.050000:3197373.234,1.089375:3196841.895,
+#*# 	1.130625:3196287.271,1.170000:3195777.362,1.209375:3195323.717,
+#*# 	1.250625:3194819.605,1.290000:3194348.391,1.329375:3193870.317,
+#*# 	1.370625:3193378.658,1.410000:3192960.009,1.449375:3192507.828,
+#*# 	1.490625:3192045.621,1.530000:3191610.324,1.569375:3191190.247,
+#*# 	1.610625:3190723.391,1.650000:3190337.960,1.689375:3189920.519,
+#*# 	1.730625:3189525.613,1.770000:3189148.403,1.809375:3188757.503,
+#*# 	1.850625:3188361.606,1.890000:3187973.006,1.929375:3187628.329,
+#*# 	1.970625:3187235.381,2.010000:3186884.127,2.049375:3186535.537,
+#*# 	2.090625:3186171.254,2.130000:3185813.883,2.169375:3185481.720,
+#*# 	2.210625:3185165.809,2.250000:3184853.956,2.289375:3184549.754,
+#*# 	2.330625:3184205.895,2.370000:3183899.023,2.409375:3183614.516,
+#*# 	2.450625:3183277.335,2.490000:3183002.318,2.529375:3182697.700,
+#*# 	2.570625:3182415.660,2.610000:3182094.959,2.649375:3181837.844,
+#*# 	2.690625:3181578.901,2.730000:3181327.183,2.769375:3181047.735,
+#*# 	2.810625:3180795.383,2.850000:3180550.539,2.889375:3180300.259,
+#*# 	2.930625:3180045.951,2.970000:3179797.046,3.009375:3179575.233,
+#*# 	3.050625:3179314.108,3.090000:3179110.532,3.129375:3178861.749,
+#*# 	3.170625:3178658.559,3.210000:3178422.813,3.249375:3178225.207,
+#*# 	3.290625:3177999.752,3.330000:3177814.053,3.369375:3177605.370,
+#*# 	3.410625:3177398.424,3.450000:3177180.308,3.489375:3177000.046,
+#*# 	3.530625:3176801.711,3.570000:3176590.294,3.609375:3176428.188,
+#*# 	3.650625:3176232.664,3.690000:3176060.268,3.729375:3175884.465,
+#*# 	3.770625:3175703.227,3.810000:3175522.169,3.849375:3175355.457,
+#*# 	3.890625:3175177.179,3.930000:3175013.955,3.969375:3174856.641,
+#*# 	4.010625:3174687.118,4.050000:3174538.597
+#*#
+#*# [temperature_probe btt_eddy]
+#*# calibration_temp = 49.507044
+#*# drift_calibration =
+#*# 	3230015.991116, -555.958116, 3.648101
+#*# 	3204408.122206, 61.392774, -1.963283
+#*# 	3186003.423636, 462.888600, -5.498820
+#*# 	3170450.778710, 816.534590, -8.643324
+#*# 	3156709.579450, 1156.143739, -11.778975
+#*# 	3149878.642138, 1256.635033, -12.555585
+#*# 	3141411.326792, 1458.752675, -14.411459
+#*# 	3134496.763341, 1624.209691, -15.940394
+#*# 	3129936.707388, 1716.802159, -16.782372
+#*# drift_calibration_min_temp = 42.422879682326844
